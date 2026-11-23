@@ -1,0 +1,68 @@
+USE master;
+GO
+
+-- Eğer veritabanı zaten varsa bağlantıları kesip siliyoruz
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'halisahadb')
+BEGIN
+    ALTER DATABASE halisahadb SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE halisahadb;
+END
+GO
+
+-- Veritabanını sıfırdan oluşturuyoruz
+CREATE DATABASE halisahadb;
+GO
+
+USE halisahadb;
+GO
+
+-- Tabloları oluşturma
+CREATE TABLE kullanicilar (
+    kullanici_id INT IDENTITY(1,1) PRIMARY KEY,
+    kullanici_adi VARCHAR(50) NOT NULL,
+    sifre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE sahalar (
+    saha_id INT IDENTITY(1,1) PRIMARY KEY,
+    saha_adi VARCHAR(30) NOT NULL,
+    sabit_ucret DECIMAL(10,2) NOT NULL DEFAULT 3500.00
+);
+
+CREATE TABLE rezervasyonlar (
+    rezervasyon_id INT IDENTITY(1,1) PRIMARY KEY,
+    musteri_ad_soyad VARCHAR(100) NOT NULL,
+    telefon VARCHAR(15),
+    saha_adi VARCHAR(30) NOT NULL,
+    tarih VARCHAR(20) NOT NULL,
+    saat VARCHAR(20) NOT NULL,
+    ucret DECIMAL(10,2) NOT NULL DEFAULT 3500.00,
+    odendi_mi VARCHAR(10) NOT NULL DEFAULT 'Ödenmedi'
+);
+
+CREATE TABLE iptal_rezervasyonlar (
+    iptal_id INT IDENTITY(1,1) PRIMARY KEY,
+    musteri_ad_soyad VARCHAR(100) NOT NULL,
+    telefon VARCHAR(15),
+    saha_adi VARCHAR(30) NOT NULL,
+    tarih VARCHAR(20) NOT NULL,
+    saat VARCHAR(20) NOT NULL,
+    ucret DECIMAL(10,2) NOT NULL DEFAULT 3500.00,
+    odendi_mi VARCHAR(10) NOT NULL DEFAULT 'Ödenmedi',
+    iptal_tarihi DATETIME DEFAULT GETDATE()
+);
+
+-- Kullanıcı hesabın
+INSERT INTO kullanicilar (kullanici_adi, sifre) 
+VALUES ('Berke Bozacıoğlu', 'BekossHuntrr');
+
+-- Sahalar ve sabit ücretleri
+INSERT INTO sahalar (saha_adi, sabit_ucret) VALUES 
+('Saha 1 (Açık)', 3500.00),
+('Saha 2 (Kapalı)', 3500.00),
+('Saha 3 (V.I.P)', 3500.00);
+
+-- Ekstra garanti olması için tabloyu sıfırlama komutu (İsteğe bağlı)
+TRUNCATE TABLE rezervasyonlar;
+TRUNCATE TABLE iptal_rezervasyonlar;
+GO
